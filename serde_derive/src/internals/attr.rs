@@ -247,11 +247,26 @@ pub enum TagType {
     /// ```
     Adjacent { tag: String, content: String },
 
+    /// `#[serde(tag = "t", content = "c", content_missing = Error)]`
+    ///
+    /// ```json
+    /// {"t": "variant1", "c": null }
+    /// {"t": "variant1"}
+    /// ```
+    AdjacentMaybeNone { tag: String, content: String, content_missing: AdjacentlyTaggedContentMissingAction },
+
     /// `#[serde(untagged)]`
     ///
     /// ```json
     /// {"key1": "value1", "key2": "value2"}
     /// ```
+    None,
+}
+
+/// Action to take when the content field is missing from an Adjacently-Tagged enum.
+pub enum AdjacentlyTaggedContentMissingAction {
+    Error,
+    Default,
     None,
 }
 

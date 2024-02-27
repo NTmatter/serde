@@ -9,6 +9,7 @@ use std::ptr;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::{parse_quote, Ident, Index, Member};
+use internals::attr::{AdjacentlyTaggedContentMissingAction, TagType};
 
 pub fn expand_derive_deserialize(input: &mut syn::DeriveInput) -> syn::Result<TokenStream> {
     replace_receiver(input);
@@ -1204,7 +1205,10 @@ fn deserialize_homogeneous_enum(
             deserialize_internally_tagged_enum(params, variants, cattrs, tag)
         }
         attr::TagType::Adjacent { tag, content } => {
-            deserialize_adjacently_tagged_enum(params, variants, cattrs, tag, content)
+            deserialize_adjacently_tagged_enum(params, variants, cattrs, tag, content, &AdjacentlyTaggedContentMissingAction::Error)
+        }
+        attr::TagType::AdjacentMaybeNone { tag, content, content_missing } => {
+            deserialize_adjacently_tagged_enum(params, variants, cattrs, tag, content, content_missing)
         }
         attr::TagType::None => deserialize_untagged_enum(params, variants, cattrs),
     }
@@ -1402,6 +1406,7 @@ fn deserialize_adjacently_tagged_enum(
     cattrs: &attr::Container,
     tag: &str,
     content: &str,
+    content_missing: &AdjacentlyTaggedContentMissingAction
 ) -> Fragment {
     let this_type = &params.this_type;
     let this_value = &params.this_value;
@@ -1460,6 +1465,7 @@ fn deserialize_adjacently_tagged_enum(
         }
     };
 
+    // TODO I Think this is the bit I need to understand and modify.
     let mut missing_content = quote! {
         _serde::__private::Err(<__A::Error as _serde::de::Error>::missing_field(#content))
     };
