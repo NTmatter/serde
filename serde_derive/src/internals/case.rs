@@ -8,6 +8,7 @@ use std::fmt::{self, Debug, Display};
 pub type NameMapper = fn(&str) -> String;
 
 /// The different possible ways to change case of fields in a struct, or variants in an enum.
+#[allow(unused)]
 #[derive(Clone, PartialEq)]
 pub enum RenameRule {
     /// Don't apply a default rename rule.
