@@ -332,6 +332,12 @@ impl Container {
                 } else if meta.path == RENAME_ALL {
                     // #[serde(rename_all = "foo")]
                     // #[serde(rename_all(serialize = "foo", deserialize = "bar"))]
+                    // WIP Add to the existing rename_all syntax, or use a separate rename_all_with?
+                    // #[serde(rename_all(serialize_with = "foo:bar", deserialize_with = "foo::baz"))]
+                    // #[serde(rename_all(serialize = "foo", deserialize_with = "foo::baz"))]
+                    // #[serde(rename_all(serialize_with = "foo:bar", deserialize = "bar"))]
+                    // DESIGN Should this be a separate branch? #[serde(rename_all_with = "foo::bar")]
+                    // DESIGN Handle a mix of rename_all(serialize) and rename_all_with(deserialize)
                     let one_name = meta.input.peek(Token![=]);
                     let (ser, de) = get_renames(cx, RENAME_ALL, &meta)?;
                     if let Some(ser) = ser {
