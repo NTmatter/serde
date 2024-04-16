@@ -4,8 +4,11 @@
 use self::RenameRule::*;
 use std::fmt::{self, Debug, Display};
 
+/// Mapping function that maps a field or variant name to a new string.
+pub type NameMapper = fn(&str) -> String;
+
 /// The different possible ways to change case of fields in a struct, or variants in an enum.
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum RenameRule {
     /// Don't apply a default rename rule.
     None,
@@ -28,6 +31,8 @@ pub enum RenameRule {
     KebabCase,
     /// Rename direct children to "SCREAMING-KEBAB-CASE" style.
     ScreamingKebabCase,
+    /// Use a custom function to provide a mapping
+    Fn(NameMapper),
 }
 
 static RENAME_RULES: &[(&str, RenameRule)] = &[
@@ -45,7 +50,7 @@ impl RenameRule {
     pub fn from_str(rename_all_str: &str) -> Result<Self, ParseError> {
         for (name, rule) in RENAME_RULES {
             if rename_all_str == *name {
-                return Ok(*rule);
+                return Ok(rule.clone());
             }
         }
         Err(ParseError {
@@ -75,6 +80,8 @@ impl RenameRule {
             ScreamingKebabCase => ScreamingSnakeCase
                 .apply_to_variant(variant)
                 .replace('_', "-"),
+
+            Fn(f) => f(variant),
         }
     }
 
@@ -105,6 +112,8 @@ impl RenameRule {
             ScreamingSnakeCase => field.to_ascii_uppercase(),
             KebabCase => field.replace('_', "-"),
             ScreamingKebabCase => ScreamingSnakeCase.apply_to_field(field).replace('_', "-"),
+
+            Fn(f) => f(field),
         }
     }
 

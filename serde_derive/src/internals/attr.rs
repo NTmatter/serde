@@ -183,7 +183,7 @@ impl Name {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct RenameAllRules {
     serialize: RenameRule,
     deserialize: RenameRule,
@@ -600,11 +600,11 @@ impl Container {
     }
 
     pub fn rename_all_rules(&self) -> RenameAllRules {
-        self.rename_all_rules
+        self.rename_all_rules.clone()
     }
 
     pub fn rename_all_fields_rules(&self) -> RenameAllRules {
-        self.rename_all_fields_rules
+        self.rename_all_fields_rules.clone()
     }
 
     pub fn transparent(&self) -> bool {
@@ -994,7 +994,7 @@ impl Variant {
     }
 
     pub fn rename_all_rules(&self) -> RenameAllRules {
-        self.rename_all_rules
+        self.rename_all_rules.clone()
     }
 
     pub fn ser_bound(&self) -> Option<&[syn::WherePredicate]> {
