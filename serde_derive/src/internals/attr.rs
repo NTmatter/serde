@@ -1422,13 +1422,23 @@ where
                 if let Some(v) = f(cx, attr_name, SERIALIZE, &meta)?.into() {
                     ser_meta.insert(&meta.path, v);
                 }
+            } else if meta.path == SERIALIZE_WITH {
+                if let Some(v) = f(cx, attr_name, SERIALIZE_WITH, &meta)?.into() {
+                    ser_meta.insert(&meta.path, v);
+                    todo!("Extract function name?");
+                }
             } else if meta.path == DESERIALIZE {
                 if let Some(v) = f(cx, attr_name, DESERIALIZE, &meta)?.into() {
                     de_meta.insert(&meta.path, v);
                 }
+            } else if meta.path == DESERIALIZE_WITH {
+                if let Some(v) = f(cx, attr_name, DESERIALIZE_WITH, &meta)?.into() {
+                    de_meta.insert(&meta.path, v);
+                    todo!("Extract function name?");
+                }
             } else {
                 return Err(meta.error(format_args!(
-                    "malformed {0} attribute, expected `{0}(serialize = ..., deserialize = ...)`",
+                    "malformed {0} attribute, expected `{0}(serialize | serialize_with = ..., deserialize | deserialize_with = ...)`",
                     attr_name,
                 )));
             }
